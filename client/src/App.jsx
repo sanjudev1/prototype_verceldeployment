@@ -5,7 +5,7 @@ function UserList() {
 
   useEffect(() => {
     // Fetch data from server when component mounts
-    fetch('http://localhost:3000/get')
+    fetch('https://prototype-verceldeployment-server.vercel.app/get')
       .then((response) => response.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error(err));

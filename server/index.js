@@ -1,5 +1,4 @@
 import express from 'express';
-import sql from './db.js';
 import cors from 'cors';
 
 const app = express();
@@ -7,46 +6,24 @@ const port = 3010;
 
 app.use(cors());
 
+// Static data to simulate database content
 const users = [
   { name: 'John Doe', age: 30 },
   { name: 'Jane Doe', age: 25 },
   { name: 'Bob Builder', age: 35 },
 ];
 
-async function createSampleData() {
-  try {
-    for (let user of users) {
-      await sql`
-        INSERT INTO users (name, age)
-        VALUES (${user.name}, ${user.age})
-      `;
-    }
-  } catch (error) {
-    console.error('Error creating sample data:', error);
-  }
-}
-
-app.post('/create-sample-data', async (req, res) => {
-  try {
-    await createSampleData();
-    res.status(200).send('Sample data created');
-  } catch (error) {
-    res.status(500).send('Error creating sample data');
-  }
+// Endpoint to simulate creating sample data (normally this would insert into a database)
+app.post('/create-sample-data', (req, res) => {
+  // For static data, we assume the data is already "created"
+  res.status(200).send('Sample data "created" (static)');
 });
 
-app.get('/get', async (req, res) => {
-  try {
-    const data = await sql`
-      SELECT name, age
-      FROM users
-      WHERE age > ${20}
-    `;
-    res.status(200).send(data);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).send('Error fetching data');
-  }
+// Endpoint to get users over a certain age
+app.get('/get', (req, res) => {
+  // Simulate a database query by filtering the static data
+  const data = users.filter(user => user.age > 20);
+  res.status(200).json(data);
 });
 
 // Start the server

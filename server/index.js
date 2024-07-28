@@ -1,22 +1,29 @@
 import express from 'express';
 import cors from 'cors';
+// Ensure you have this installed
 
 const app = express();
 const port = 3010;
 
-app.use(cors());
-app.use((req, res, next) => {
-    const corsWhitelist = [
-        'https://youtube-app-sanju-vert.vercel.app',
-        'https://prototype-verceldeployment-client.vercel.app',
-    ];
-    if (corsWhitelist.indexOf(req.headers.origin) !== -1) {
-        res.header('Access-Control-Allow-Origin', req.headers.origin);
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    }
+const corsWhitelist = [
+    'https://youtube-app-sanju-vert.vercel.app',
+    'https://prototype-verceldeployment-client.vercel.app',
+    'https://prototype-verceldeployment-server.vercel.app',
+];
 
-    next();
-});
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (corsWhitelist.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
 // Static data to simulate database content
 const users = [
   { name: 'John Doe', age: 30 },
@@ -37,13 +44,24 @@ app.get('/get', (req, res) => {
   res.status(200).json(data);
 });
 
-app.get('/search',async(req,res)=>{
-  const search = req.query.q
-  const data = await fetch('https://suggestqueries.google.com/complete/search?client=firefox&q='+search)
-  const response = await data.json()
-  res.status(200).json(response);
-}
-
+// Endpoint to search using external API
+app.get('/search', async (req, res) => {
+  try {
+    const search = req.query.q;
+    if (!search) {
+      return res.status(400).json({ error: 'Query parameter "q" is required' });
+    }
+    const apiResponse = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&q=${search}`);
+    if (!apiResponse.ok) {
+      throw new Error(`HTTP error! status: ${apiResponse.status}`);
+    }
+    const response = await apiResponse.json();
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ message: 'Error fetching data' });
+  }
+});
 
 // Start the server
 app.listen(port, () => {

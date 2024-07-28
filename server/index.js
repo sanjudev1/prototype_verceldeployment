@@ -4,13 +4,13 @@ const port = 3010;
 import sql from './db.js';
 import cors from 'cors';
 app.use(cors());
-async function createSampleData() {
-  const users = [
+ const users = [
     { name: 'John Doe', age: 30 },
     { name: 'Jane Doe', age: 25 },
     { name: 'Bob Builder', age: 35 },
   ];
-
+async function createSampleData() {
+ 
   for (let user of users) {
     await sql`
         INSERT INTO users (name, age)

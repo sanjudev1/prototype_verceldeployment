@@ -1,40 +1,52 @@
 import express from 'express';
-const app = express();
-const port = 3010;
 import sql from './db.js';
 import cors from 'cors';
+
+const app = express();
+const port = 3010;
+
 app.use(cors());
- const users = [
-    { name: 'John Doe', age: 30 },
-    { name: 'Jane Doe', age: 25 },
-    { name: 'Bob Builder', age: 35 },
-  ];
+
+const users = [
+  { name: 'John Doe', age: 30 },
+  { name: 'Jane Doe', age: 25 },
+  { name: 'Bob Builder', age: 35 },
+];
+
 async function createSampleData() {
- 
-  for (let user of users) {
-    await sql`
+  try {
+    for (let user of users) {
+      await sql`
         INSERT INTO users (name, age)
         VALUES (${user.name}, ${user.age})
       `;
+    }
+  } catch (error) {
+    console.error('Error creating sample data:', error);
   }
 }
-//post request to create sample data
+
 app.post('/create-sample-data', async (req, res) => {
-  await createSampleData();
-  res.send('Sample data created');
-});
-app.get('/get', async (req, res) => {
-  async function getUsersOver(age) {
-    const users = await sql`
-          select name, age
-          from users
-          where age > ${age}
-        `;
-    return users;
+  try {
+    await createSampleData();
+    res.status(200).send('Sample data created');
+  } catch (error) {
+    res.status(500).send('Error creating sample data');
   }
-  const data = await getUsersOver(20);
-  console.log(data);
-  res.send(data);
+});
+
+app.get('/get', async (req, res) => {
+  try {
+    const data = await sql`
+      SELECT name, age
+      FROM users
+      WHERE age > ${20}
+    `;
+    res.status(200).send(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).send('Error fetching data');
+  }
 });
 
 // Start the server

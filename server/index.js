@@ -1,6 +1,6 @@
 import express from 'express';
 const app = express();
-const port = 3000;
+const port = 3010;
 import sql from './db.js';
 import cors from 'cors';
 app.use(cors());

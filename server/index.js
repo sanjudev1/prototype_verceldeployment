@@ -48,9 +48,9 @@ app.get('/get', (req, res) => {
 app.get('/search', async (req, res) => {
   try {
     const search = req.query.q;
-    if (!search) {
-      return res.status(400).json({ error: 'Query parameter "q" is required' });
-    }
+    // if (!search) {
+    //   return res.status(400).json({ error: 'Query parameter "q" is required' });
+    // }
     const apiResponse = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&q=${search}`);
     if (!apiResponse.ok) {
       throw new Error(`HTTP error! status: ${apiResponse.status}`);
